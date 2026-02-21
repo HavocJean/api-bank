@@ -34,7 +34,7 @@ class TransactionService {
             $totalValue = $value + ($value * $tax);
 
             if($account['saldo'] < $totalValue) {
-                throw new Exception("Saldo insuficiente", 422);
+                throw new Exception("Saldo insuficiente", 404);
             }
 
             $newBalance = $account['saldo'] - $totalValue;

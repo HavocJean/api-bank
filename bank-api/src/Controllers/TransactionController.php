@@ -48,9 +48,10 @@ class TransactionController {
                 $value
             );
 
+            http_response_code(201);
+            echo json_encode($result);
         } catch (Exception $e) {
             http_response_code(404);
-
             echo json_encode([
                 'error' => $e->getMessage()
             ]);
