@@ -62,4 +62,40 @@ class AccountRepository {
 
         return $result ?: null;
     }
+
+    public function findAccountNumberForUpdate(int $accountNumber) :?array {
+        $sql = "SELECT
+                    id, saldo
+                FROM
+                    contas
+                WHERE
+                    numero_conta = :numero_conta
+                FOR UPDATE";
+        
+        $stmt = $this->pdo->prepare($sql);
+
+        $stmt->execute([
+            "numero_conta" => $accountNumber
+        ]);
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result ?: null;
+    }
+
+    public function updateBalance(int $id, float $balance) :void {
+        $sql = "UPDATE
+                    contas
+                SET
+                    saldo = :saldo
+                WHERE
+                    id = :id";
+        
+        $stmt = $this->pdo->prepare($sql);
+
+        $stmt->execute([
+            'saldo' => $balance,
+            'id' => $id
+        ]);
+    }
 }
