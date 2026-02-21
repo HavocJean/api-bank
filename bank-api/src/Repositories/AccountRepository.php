@@ -12,7 +12,7 @@ class AccountRepository {
         $this->pdo = Connection::get();
     }
 
-    public function exists(int $accountNumber) :bool {
+    public function existsAccount(int $accountNumber) :bool {
         $sql = "SELECT
                     1
                 FROM
@@ -29,7 +29,7 @@ class AccountRepository {
         return (bool) $stmt->fetch();
     }
 
-    public function create(int $accountNumber, float $balance) :void {
+    public function createAccount(int $accountNumber, float $balance) :void {
         $sql = "INSERT INTO contas
                     (numero_conta, saldo)
                 VALUES

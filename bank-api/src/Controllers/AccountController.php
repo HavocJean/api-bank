@@ -15,24 +15,39 @@ class AccountController {
             return;
         }
 
+        $accountNumber = filter_var($data['numero_conta'], FILTER_VALIDATE_INT);
+        $balance = filter_var($data['saldo'], FILTER_VALIDATE_FLOAT);
+
+        if ($accountNumber === false || $accountNumber <= 0) {
+            http_response_code(400);
+            echo json_encode(["error" => "Numero da conta deve ser um numero inteiro e positivo"]);
+            return;
+        }
+
+        if ($balance === false || $balance < 0) {
+            http_response_code(400);
+            echo json_encode(["error" => "Saldo deve ser maior ou igual a zero"]);
+            return;
+        }
+
         $accountRepository = new AccountRepository();
 
-        if($accountRepository->exists($data['numero_conta'])) {
-            http_response_code(400);
+        if($accountRepository->existsAccount($accountNumber)) {
+            http_response_code(409);
             echo json_encode(["error" => "Conta ja existe"]);
             return;
         }
 
-        $accountRepository->create(
-            $data['numero_conta'],
-            $data['saldo']
+        $accountRepository->createAccount(
+            $accountNumber,
+            $balance
         );
 
         http_response_code(201);
 
         echo json_encode([
-            "numero_conta" => (int)$data['numero_conta'],
-            "saldo" => (float)$data['saldo']
+            "numero_conta" => (int)$accountNumber,
+            "saldo" => (float)$balance
         ]);
     }
 
@@ -44,15 +59,27 @@ class AccountController {
             return;
         }
 
+        $accountNumber = filter_var($accountNumber, FILTER_VALIDATE_INT);
+        
+        if ($accountNumber === false || $accountNumber <= 0) {
+            http_response_code(400);
+            echo json_encode(["error" => "Numero da conta deve ser um número inteiro positivo"]);
+            return;
+        }
+
         $accountRepository = new AccountRepository();
 
         if(!$account = $accountRepository->findByAccountNumber($accountNumber)) {
             http_response_code(404);
+            echo json_encode(["error" => "Conta não encontrada"]);
             return;
         }
 
         http_response_code(200);
 
-        echo json_encode($account);
+        echo json_encode([
+            "numero_conta" => (int)$account['numero_conta'],
+            "saldo" => (float)$account['saldo']
+        ]);
     }
 }
