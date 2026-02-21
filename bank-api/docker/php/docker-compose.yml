@@ -1,0 +1,41 @@
+services:
+  app:
+    build:
+      context: ../../
+      dockerfile: docker/php/Dockerfile
+    container_name: bank_api_app
+    volumes:
+      - ../../:/var/www
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: bank
+      DB_USER: bank_user
+      DB_PASS: bank_pass
+    networks:
+      - bank-network
+
+  postgres:
+    image: postgres:16
+    container_name: bank_api_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: bank
+      POSTGRES_USER: bank_user
+      POSTGRES_PASSWORD: bank_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - bank-network
+
+volumes:
+  pgdata:
+
+networks:
+  bank-network:
