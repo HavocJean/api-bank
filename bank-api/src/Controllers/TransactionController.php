@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Helpers\Response;
 use App\Services\TransactionService;
 use Exception;
 
@@ -16,28 +17,24 @@ class TransactionController {
         $data = json_decode(file_get_contents('php://input'), true);
 
         if (!isset($data['forma_pagamento']) || !isset($data['numero_conta']) || !isset($data['valor'])) {
-            http_response_code(400);
-            echo json_encode(["error" => "Dados inválidos"]);
+            Response::error("Dados inválidos", 400);
             return;
         }
 
         if (!in_array($data['forma_pagamento'], ['P', 'C', 'D'])) {
-            http_response_code(400);
-            echo json_encode(["error" => "Forma de pagamento deve ser pix, credito ou debito."]);
+            Response::error("Forma de pagamento deve ser pix, credito ou debito.", 400);
             return;
         }
 
         $accountNumber = filter_var($data['numero_conta'], FILTER_VALIDATE_INT);
         if ($accountNumber === false || $accountNumber <= 0) {
-            http_response_code(400);
-            echo json_encode(["error" => "Numero da conta deve ser um número"]);
+            Response::error("Numero da conta deve ser um número", 400);
             return;
         }
 
         $value = filter_var($data['valor'], FILTER_VALIDATE_FLOAT);
         if ($value === false || $value <= 0) {
-            http_response_code(400);
-            echo json_encode(["error" => "Valor deve ser um numero positivo"]);
+            Response::error("Valor deve ser um numero positivo", 400);
             return;
         }
 
@@ -48,13 +45,9 @@ class TransactionController {
                 $value
             );
 
-            http_response_code(201);
-            echo json_encode($result);
+            Response::success($result, 201);
         } catch (Exception $e) {
-            http_response_code(404);
-            echo json_encode([
-                'error' => $e->getMessage()
-            ]);
+            Response::error($e->getMessage(), 404);
         }
     }
 }
