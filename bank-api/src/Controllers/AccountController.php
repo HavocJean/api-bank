@@ -3,9 +3,17 @@
 namespace App\Controllers;
 
 use App\Helpers\Response;
-use App\Repositories\AccountRepository;
+use App\Contracts\AccountRepositoryInterface;
 
 class AccountController {
+
+    private AccountRepositoryInterface $accountRepository;
+
+    public function __construct(
+        AccountRepositoryInterface $accountRepository
+    ) {
+        $this->accountRepository = $accountRepository;
+    }
 
     public function register() :void {
         $data = json_decode(file_get_contents("php://input"), true);
@@ -28,14 +36,12 @@ class AccountController {
             return;
         }
 
-        $accountRepository = new AccountRepository();
-
-        if($accountRepository->existsAccount($accountNumber)) {
+        if($this->accountRepository->existsAccount($accountNumber)) {
             Response::error("Conta ja existe", 409);
             return;
         }
 
-        $accountRepository->createAccount(
+        $this->accountRepository->createAccount(
             $accountNumber,
             $balance
         );
@@ -61,9 +67,7 @@ class AccountController {
             return;
         }
 
-        $accountRepository = new AccountRepository();
-
-        if(!$account = $accountRepository->findByAccountNumber($accountNumber)) {
+        if(!$account = $this->accountRepository->findByAccountNumber($accountNumber)) {
             Response::error("Conta nao encontrada", 404);
             return;
         }

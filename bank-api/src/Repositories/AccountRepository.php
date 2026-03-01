@@ -2,14 +2,15 @@
 
 namespace App\Repositories;
 
-use App\Database\Connection;
 use PDO;
+use App\Contracts\AccountRepositoryInterface;
 
-class AccountRepository {
+class AccountRepository implements AccountRepositoryInterface
+{
     private PDO $pdo;
 
-    public function __construct() {
-        $this->pdo = Connection::get();
+    public function __construct(PDO $pdo) {
+        $this->pdo = $pdo;
     }
 
     public function existsAccount(int $accountNumber) :bool {
@@ -63,7 +64,7 @@ class AccountRepository {
         return $result ?: null;
     }
 
-    public function findAccountNumberForUpdate(int $accountNumber) :?array {
+    public function findByAccountNumberForUpdate(int $accountNumber) :?array {
         $sql = "SELECT
                     id, saldo
                 FROM
