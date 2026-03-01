@@ -8,7 +8,11 @@ API REST Gestão bancária
 
 ```bash
 cd bank-api/docker/php
-docker-compose up --build
+docker compose up -d --build
+```
+
+```
+docker exec -it bank_api_app composer install
 ```
 
 A API estará disponível em `http://localhost:8000`

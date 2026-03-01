@@ -6,6 +6,7 @@ require __DIR__.'/../vendor/autoload.php';
 use App\Router\Router;
 use App\Controllers\AccountController;
 use App\Controllers\TransactionController;
+use App\Exceptions\ExceptionHandler;
 
 $router = new Router();
 
@@ -16,4 +17,8 @@ $router->add('POST', '/transacao', [TransactionController::class, 'transaction']
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $method = $_SERVER['REQUEST_METHOD'];
 
-$router->dispatch($method, $uri);
+try {
+    $router->dispatch($method, $uri);
+} catch (Throwable $e) {
+    ExceptionHandler::handle($e);
+}
