@@ -2,16 +2,18 @@
 
 namespace App\Exceptions;
 
+use App\Helpers\Response;
+
 class ExceptionHandler 
 {
-    public static function handle(Throwable $e) {
+    public static function handle(\Throwable $e) {
         switch (true) {
             case $e instanceof AccountNotFoundException:
                 Response::error($e->getMessage(), 404);
                 break;
             
             case $e instanceof BalanceNotFoundException:
-                Response:error($e->getMessage(), 422);
+                Response::error($e->getMessage(), 422);
                 break;
 
             default:
