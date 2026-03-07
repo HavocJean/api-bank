@@ -2,6 +2,8 @@
 
 namespace App\Router;
 
+use App\Helpers\Response;
+
 class Router
 {
     private array $routes = [];
@@ -27,10 +29,6 @@ class Router
             }
         }
 
-        http_response_code(404);
-
-        echo json_encode([
-            'error' => 'Route not found'
-        ]);
+        Response::error("Route not found", 404);
     }
 }
