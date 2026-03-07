@@ -5,6 +5,8 @@ namespace App\Services;
 use PDO;
 use Exception;
 use App\Contracts\AccountRepositoryInterface;
+use App\Exceptions\AccountNotFoundException;
+use App\Exceptions\BalanceNotFoundException;
 
 class TransactionService {
     private PDO $pdo;
@@ -28,7 +30,7 @@ class TransactionService {
 
         try {
             if (!$account = $this->accountRepository->findByAccountNumberForUpdate($accountNumber)) {
-                throw new Exception("Conta nao encontrada", 404);
+                throw new AccountNotFoundException();
             }
 
             $tax = $this->getTax($paymentMethod);
@@ -36,7 +38,7 @@ class TransactionService {
             $totalValue = $value + ($value * $tax);
 
             if($account['saldo'] < $totalValue) {
-                throw new Exception("Saldo insuficiente", 404);
+                throw new BalanceNotFoundException();
             }
 
             $newBalance = $account['saldo'] - $totalValue;
