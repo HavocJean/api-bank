@@ -9,45 +9,47 @@ use Exception;
 class TransactionController {
     private TransactionService $service;
 
-    public function __construct() {
-        $this->service = new TransactionService();
+    public function __construct(TransactionService $transactionService) {
+        $this->service = $transactionService;
     }
 
-    public function transaction() {
+    public function transaction(): void {
         $data = json_decode(file_get_contents('php://input'), true);
 
-        if (!isset($data['forma_pagamento']) || !isset($data['numero_conta']) || !isset($data['valor'])) {
-            Response::error("Dados inválidos", 400);
+        if (
+            !isset($data['forma_pagamento']) ||
+            !isset($data['numero_conta']) ||
+            !isset($data['valor'])
+        ) {
+            Response::error("Dados inválidos.", 400);
             return;
         }
 
-        if (!in_array($data['forma_pagamento'], ['P', 'C', 'D'])) {
+        $paymentMethod = $data['forma_pagamento'];
+        $accountNumber = filter_var($data['numero_conta'], FILTER_VALIDATE_INT);
+        $value = filter_var($data['valor'], FILTER_VALIDATE_FLOAT);
+
+        if (!in_array($paymentMethod, ['P', 'C', 'D'])) {
             Response::error("Forma de pagamento deve ser pix, credito ou debito.", 400);
             return;
         }
 
-        $accountNumber = filter_var($data['numero_conta'], FILTER_VALIDATE_INT);
         if ($accountNumber === false || $accountNumber <= 0) {
-            Response::error("Numero da conta deve ser um número", 400);
+            Response::error("Numero da conta deve ser um número.", 400);
             return;
         }
 
-        $value = filter_var($data['valor'], FILTER_VALIDATE_FLOAT);
         if ($value === false || $value <= 0) {
-            Response::error("Valor deve ser um numero positivo", 400);
+            Response::error("Valor deve ser um numero positivo.", 400);
             return;
         }
 
-        try {
-            $result = $this->service->process(
-                $data['forma_pagamento'],
-                $accountNumber,
-                $value
-            );
+        $result = $this->service->process(
+            $paymentMethod,
+            $accountNumber,
+            $value
+        );
 
-            Response::success($result, 201);
-        } catch (Exception $e) {
-            Response::error($e->getMessage(), 404);
-        }
+        Response::success($result, 201);
     }
 }

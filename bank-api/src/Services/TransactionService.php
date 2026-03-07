@@ -2,18 +2,20 @@
 
 namespace App\Services;
 
-use App\Database\Connection;
-use App\Repositories\AccountRepository;
-use Exception;
 use PDO;
+use Exception;
+use App\Contracts\AccountRepositoryInterface;
 
 class TransactionService {
     private PDO $pdo;
-    private AccountRepository $accountRepository;
+    private AccountRepositoryInterface $accountRepository;
 
-    public function __construct() {
-        $this->pdo = Connection::get();
-        $this->accountRepository = new AccountRepository($this->pdo);
+    public function __construct(
+        PDO $pdo,
+        AccountRepositoryInterface $accountRepository
+    ) {
+        $this->pdo = $pdo;
+        $this->accountRepository = $accountRepository;
     }
 
     public function process(
@@ -25,7 +27,7 @@ class TransactionService {
         $this->pdo->beginTransaction();
 
         try {
-            if (!$account = $this->accountRepository->findAccountNumberForUpdate($accountNumber)) {
+            if (!$account = $this->accountRepository->findByAccountNumberForUpdate($accountNumber)) {
                 throw new Exception("Conta nao encontrada", 404);
             }
 

@@ -8,6 +8,7 @@ use App\Router\Router;
 use App\Database\Connection;
 use App\Controllers\AccountController;
 use App\Controllers\TransactionController;
+use App\Services\TransactionService;
 use App\Repositories\AccountRepository;
 use App\Exceptions\ExceptionHandler;
 
@@ -16,11 +17,14 @@ $pdo = Connection::get();
 $accountRepository = new AccountRepository($pdo);
 $accountController = new AccountController($accountRepository);
 
+$transactionService = new TransactionService($pdo, $accountRepository);
+$transactionController = new TransactionController($transactionService);
+
 $router = new Router();
 
 $router->add('POST', '/conta', [$accountController,'register']);
 $router->add('GET', '/conta', [$accountController, 'show']);
-$router->add('POST', '/transacao', [TransactionController::class, 'transaction']);
+$router->add('POST', '/transacao', [$transactionController, 'transaction']);
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $method = $_SERVER['REQUEST_METHOD'];
