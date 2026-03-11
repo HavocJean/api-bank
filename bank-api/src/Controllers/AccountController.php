@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Helpers\Response;
 use App\Contracts\AccountRepositoryInterface;
+use App\Validation\CreateAccountRequest;
 
 class AccountController {
 
@@ -18,36 +19,20 @@ class AccountController {
     public function register() :void {
         $data = json_decode(file_get_contents("php://input"), true);
 
-        if(!isset($data['numero_conta']) || !isset($data['saldo'])) {
-            Response::error("Dados invalidos", 400);
-            return;
-        }
+        $validated = CreateAccountRequest::validate($data);
 
-        $accountNumber = filter_var($data['numero_conta'], FILTER_VALIDATE_INT);
-        $balance = filter_var($data['saldo'], FILTER_VALIDATE_FLOAT);
-
-        if ($accountNumber === false || $accountNumber <= 0) {
-            Response::error("Numero da conta deve ser um numero inteiro e positivo", 400);
-            return;
-        }
-
-        if ($balance === false || $balance < 0) {
-            Response::error("Saldo deve ser maior ou igual a zero", 400);
-            return;
-        }
-
-        if($this->accountRepository->existsAccount($accountNumber)) {
+        if($this->accountRepository->existsAccount($validated['account_number'])) {
             Response::error("Conta ja existe", 409);
             return;
         }
 
         $this->accountRepository->createAccount(
-            $accountNumber,
-            $balance
+            $validated['account_number'],
+            $validated['balance']
         );
 
         Response::success([
-            "numero_conta" => (int)$accountNumber,
+            "numero_conta" => (int)$validated['account_number'],
             "saldo" => (float)$balance
         ], 201);
     }
