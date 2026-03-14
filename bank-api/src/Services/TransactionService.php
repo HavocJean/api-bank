@@ -7,6 +7,10 @@ use Exception;
 use App\Contracts\AccountRepositoryInterface;
 use App\Exceptions\AccountNotFoundException;
 use App\Exceptions\BalanceNotFoundException;
+use App\Strategy\PaymentTaxStrategy;
+use App\Strategy\CreditTaxStrategy;
+use App\Strategy\DebitTaxStrategy;
+use App\Strategy\PixTaxStrategy;
 
 class TransactionService {
     private PDO $pdo;
@@ -33,9 +37,9 @@ class TransactionService {
                 throw new AccountNotFoundException();
             }
 
-            $tax = $this->getTax($paymentMethod);
+            $strategy = $this->resolveTaxStrategy($paymentMethod);
 
-            $totalValue = $value + ($value * $tax);
+            $totalValue = $strategy->calculate($value);
 
             if($account['saldo'] < $totalValue) {
                 throw new BalanceNotFoundException();
@@ -60,13 +64,12 @@ class TransactionService {
         }
     }
 
-    public function getTax(string $method) :float {
+    public function resolveTaxStrategy(string $method) :PaymentTaxStrategy {
         return match ($method) {
-            'D' => 0.03,
-            'C' => 0.05,
-            'P' => 0.00,            
-            default => throw new Exception('Nao existe essa forma de pagamento')
+            'C' => new CreditTaxStrategy(),
+            'D' => new DebitTaxStrategy(),
+            'P' => new CreditTaxStrategy(),            
+            default => throw new Exception('Forma de pagamento invalida')
         };
     }
-
 }
