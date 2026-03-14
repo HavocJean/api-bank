@@ -4,30 +4,30 @@ API REST Gestão bancária
 
 ## Como executar
 
-### Subir o projeto com Docker
+```bash
+cd bank-api
+```
+
+### Build e subir
 
 ```bash
-cd bank-api/docker/php
-docker compose up -d --build
-```
-
-```
-docker exec -it bank_api_app composer install
+make build    # Build das imagens
+make up       # Subir os containers
 ```
 
 A API estará disponível em `http://localhost:8000`
 
-### Executar migração
+### Migração
 
 ```bash
-docker exec -it bank_api_app php src/Database/Migrate.php
+make migrate
 ```
 
-### Comandos úteis
+### Outros comandos
 
-**Recarregar autoload:**
 ```bash
-docker exec -it bank_api_app composer dump-autoload
+make logs     # Ver logs dos containers
+make down     # Derrubar os containers
 ```
 
 ## Endpoints
@@ -82,9 +82,7 @@ curl -X POST http://localhost:8000/transacao \
 }'
 ```
 
-### Estrutura
-
-Estrutura interna de `bank-api/`:
+## Estrutura
 
 ```
 bank-api/
