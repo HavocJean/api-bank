@@ -81,3 +81,26 @@ curl -X POST http://localhost:8000/transacao \
 "valor":10
 }'
 ```
+
+### Estrutura
+
+Estrutura interna de `bank-api/`:
+
+```
+bank-api/
+├── docker/php/          
+├── public/
+│   └── index.php       
+├── src/
+│   ├── Controllers/    
+│   ├── Contracts/      
+│   ├── Database/       
+│   ├── Exceptions/    
+│   ├── Helpers/        
+│   ├── Repositories/   
+│   ├── Router/         
+│   ├── Services/       
+│   └── Validation/     
+├── composer.json
+└── vendor/
+```
