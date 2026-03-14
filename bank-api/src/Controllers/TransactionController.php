@@ -20,9 +20,9 @@ class TransactionController {
        $validated = CreateTransactionRequest::validate($data);
 
         $result = $this->service->process(
-            $paymentMethod,
-            $accountNumber,
-            $value
+            $validated['payment_method'],
+            $validated['number_account'],
+            $validated['value']
         );
 
         Response::success($result, 201);
