@@ -12,3 +12,6 @@ logs:
 
 migrate:
 	docker exec bank_api_app php src/Database/Migrate.php
+
+test:
+	docker exec -it bank_api_app ./vendor/bin/phpunit
